@@ -9,6 +9,10 @@ import About from "./pages/About";
 import UploadForm from "./components/UploadForm";
 import ResultDisplay from "./components/ResultDisplay";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import MedicalHistory from "./pages/MedicalHistory";
+import Navigation from "./components/Navigation";
 
 const queryClient = new QueryClient();
 
@@ -18,11 +22,15 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <Navigation />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/upload" element={<UploadForm />} />
           <Route path="/results" element={<ResultDisplay />} />
           <Route path="/about" element={<About />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/medical-history" element={<MedicalHistory />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
