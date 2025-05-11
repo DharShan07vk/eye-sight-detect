@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader } from 'lucide-react';
 import { classifyImage } from '@/utils/mockClassifier';
+import { performDiagnosis } from '@/components/DiagnosisService';
 
 const UploadForm = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -90,14 +91,32 @@ const UploadForm = () => {
 
     try {
       setIsLoading(true);
-      const result = await classifyImage(image);
       
-      // Store the result in session storage to pass to the results page
-      sessionStorage.setItem('detectionResult', JSON.stringify({
-        isColoboma: result.isColoboma,
-        confidence: result.confidence,
-        imageUrl: preview
-      }));
+      // Check if user is logged in
+      const isLoggedIn = localStorage.getItem("user") !== null;
+      
+      if (isLoggedIn) {
+        // If logged in, use the DiagnosisService to save to medical history
+        const diagnosisResult = await performDiagnosis(image);
+        
+        // Store the result in session storage to pass to the results page
+        sessionStorage.setItem('detectionResult', JSON.stringify({
+          isColoboma: diagnosisResult.result.isColoboma,
+          confidence: diagnosisResult.result.confidence,
+          imageUrl: preview,
+          id: diagnosisResult.id
+        }));
+      } else {
+        // If not logged in, just use the classifier without saving to history
+        const result = await classifyImage(image);
+        
+        // Store the result in session storage to pass to the results page
+        sessionStorage.setItem('detectionResult', JSON.stringify({
+          isColoboma: result.isColoboma,
+          confidence: result.confidence,
+          imageUrl: preview
+        }));
+      }
       
       // Navigate to results page
       navigate('/results');

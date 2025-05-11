@@ -1,31 +1,64 @@
 
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { toast } from '@/components/ui/use-toast';
 
 interface DetectionResult {
   isColoboma: boolean;
   confidence: number;
   imageUrl: string | null;
+  id?: string;
 }
 
 const ResultDisplay = () => {
   const [result, setResult] = useState<DetectionResult | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   
   useEffect(() => {
-    // Get result from session storage
-    const storedResult = sessionStorage.getItem('detectionResult');
+    // Check if we have an ID from the query parameter
+    const params = new URLSearchParams(location.search);
+    const resultId = params.get('id');
     
-    if (storedResult) {
-      setResult(JSON.parse(storedResult));
+    if (resultId) {
+      // We are viewing a historical result
+      const historyString = localStorage.getItem("medicalHistory");
+      if (historyString) {
+        const history = JSON.parse(historyString);
+        const historyItem = history.find((item: any) => item.id === resultId);
+        
+        if (historyItem) {
+          // Convert from history format to our display format
+          setResult({
+            isColoboma: historyItem.result.isColoboma,
+            confidence: historyItem.result.confidence,
+            imageUrl: historyItem.imageURL,
+            id: historyItem.id
+          });
+        } else {
+          toast({
+            title: "Record Not Found",
+            description: "The requested diagnosis record could not be found.",
+            variant: "destructive"
+          });
+          navigate('/medical-history');
+        }
+      }
     } else {
-      // If no result found, redirect to upload page
-      navigate('/upload');
+      // Get result from session storage (new diagnosis)
+      const storedResult = sessionStorage.getItem('detectionResult');
+      
+      if (storedResult) {
+        setResult(JSON.parse(storedResult));
+      } else {
+        // If no result found, redirect to upload page
+        navigate('/upload');
+      }
     }
-  }, [navigate]);
+  }, [navigate, location.search]);
 
   const handleTryAnother = () => {
     navigate('/upload');
@@ -33,6 +66,10 @@ const ResultDisplay = () => {
 
   const handleLearnMore = () => {
     navigate('/about');
+  };
+
+  const handleViewHistory = () => {
+    navigate('/medical-history');
   };
 
   if (!result) {
@@ -109,6 +146,11 @@ const ResultDisplay = () => {
               <Button variant="outline" onClick={handleLearnMore}>
                 Learn More About Coloboma
               </Button>
+              {localStorage.getItem("user") && (
+                <Button variant="secondary" onClick={handleViewHistory}>
+                  View Medical History
+                </Button>
+              )}
             </div>
           </div>
         </div>
