@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { toast } from '@/components/ui/use-toast';
+import { motion } from 'framer-motion';
 
 interface DetectionResult {
   isColoboma: boolean;
@@ -83,30 +84,55 @@ const ResultDisplay = () => {
   }
 
   return (
-    <div className="container-center">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="container-center"
+    >
       <Card className="p-8">
         <div className="flex flex-col md:flex-row gap-6">
           {/* Image preview section */}
           {result.imageUrl && (
-            <div className="w-full md:w-1/3">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="w-full md:w-1/3"
+            >
               <img 
                 src={result.imageUrl} 
                 alt="Analyzed eye image" 
                 className="rounded-lg w-full h-auto object-cover max-h-72 md:max-h-96" 
               />
-            </div>
+            </motion.div>
           )}
           
           {/* Results section */}
-          <div className={`w-full ${result.imageUrl ? 'md:w-2/3' : ''}`}>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className={`w-full ${result.imageUrl ? 'md:w-2/3' : ''}`}
+          >
             <div className={`text-center p-4 rounded-lg mb-6 ${
               result.isColoboma 
                 ? 'bg-red-50 border border-red-200' 
                 : 'bg-green-50 border border-green-200'
             }`}>
-              <div className="text-4xl mb-2">
+              <motion.div 
+                initial={{ scale: 0.5 }}
+                animate={{ scale: 1 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 260, 
+                  damping: 20,
+                  delay: 0.4 
+                }}
+                className="text-4xl mb-2"
+              >
                 {result.isColoboma ? '❗' : '✅'}
-              </div>
+              </motion.div>
               <h2 className="text-2xl font-bold mb-1">
                 {result.isColoboma 
                   ? 'Coloboma Detected' 
@@ -116,13 +142,31 @@ const ResultDisplay = () => {
               <div className="mt-4">
                 <div className="flex justify-between text-sm mb-1">
                   <span>Confidence</span>
-                  <span className="font-semibold">{result.confidence}%</span>
+                  <motion.span 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="font-semibold"
+                  >
+                    {result.confidence}%
+                  </motion.span>
                 </div>
-                <Progress value={result.confidence} className={result.isColoboma ? 'bg-red-100' : 'bg-green-100'} />
+                <motion.div
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ delay: 0.7, duration: 0.8 }}
+                >
+                  <Progress value={result.confidence} className={result.isColoboma ? 'bg-red-100' : 'bg-green-100'} />
+                </motion.div>
               </div>
             </div>
 
-            <div className="mb-6">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.3 }}
+              className="mb-6"
+            >
               <h3 className="font-bold mb-2">What does this mean?</h3>
               {result.isColoboma ? (
                 <p>
@@ -137,29 +181,39 @@ const ResultDisplay = () => {
                   with an ophthalmologist for a comprehensive eye examination.
                 </p>
               )}
-            </div>
+            </motion.div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button onClick={handleTryAnother}>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.4 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+              <Button onClick={handleTryAnother} className="transition-transform hover:scale-105">
                 Try Another Image
               </Button>
-              <Button variant="outline" onClick={handleLearnMore}>
+              <Button variant="outline" onClick={handleLearnMore} className="transition-transform hover:scale-105">
                 Learn More About Coloboma
               </Button>
               {localStorage.getItem("user") && (
-                <Button variant="secondary" onClick={handleViewHistory}>
+                <Button variant="secondary" onClick={handleViewHistory} className="transition-transform hover:scale-105">
                   View Medical History
                 </Button>
               )}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </Card>
 
-      <div className="mt-6 text-center text-sm text-gray-500">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1, duration: 0.5 }}
+        className="mt-6 text-center text-sm text-gray-500"
+      >
         <p>This tool provides preliminary analysis only and is not a substitute for professional medical advice.</p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
