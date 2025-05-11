@@ -1,16 +1,22 @@
 
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LogOutIcon } from "lucide-react";
 
 const Navigation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
+    // Check login status whenever route changes or component mounts
+    checkLoginStatus();
+  }, [location.pathname]); // Re-check when route changes
+
+  const checkLoginStatus = () => {
     const userString = localStorage.getItem("user");
     if (userString) {
       const user = JSON.parse(userString);
@@ -19,7 +25,7 @@ const Navigation = () => {
     } else {
       setIsLoggedIn(false);
     }
-  }, []);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("user");

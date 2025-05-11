@@ -20,10 +20,12 @@ const Login = () => {
 
     // This is a mock authentication - in a real app, you'd connect to a backend
     setTimeout(() => {
+      // Get display name from email
+      const displayName = email.split('@')[0];
+      
       // Save user info to localStorage for demo purposes
-      // In a real app, you'd use proper authentication with tokens
       localStorage.setItem("user", JSON.stringify({ 
-        name: email.split('@')[0], 
+        name: displayName, 
         email 
       }));
       
@@ -32,7 +34,9 @@ const Login = () => {
         title: "Login successful",
         description: "Welcome back!",
       });
-      navigate("/");
+      
+      // Force a page refresh to update all components with login state
+      window.location.href = "/";
     }, 1000);
   };
 

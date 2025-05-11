@@ -40,7 +40,9 @@ const SignUp = () => {
         title: "Account created",
         description: "Your account has been created successfully.",
       });
-      navigate("/");
+      
+      // Force a page refresh to update all components with login state
+      window.location.href = "/";
     }, 1000);
   };
 
