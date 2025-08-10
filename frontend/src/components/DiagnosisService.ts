@@ -1,4 +1,3 @@
-
 import { classifyImage } from "@/utils/mockClassifier";
 
 export interface DiagnosisResult {
