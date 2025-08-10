@@ -1,0 +1,16 @@
+# --- Frontend ---
+node_modules/
+build/
+dist/
+*.log
+.vscode/
+.idea/
+.DS_Store
+
+# --- Backend ---
+backend/venv/
+backend/__pycache__/
+backend/*.py[cod]
+backend/*.pyo
+backend/*.pyd
+backend/*.log
