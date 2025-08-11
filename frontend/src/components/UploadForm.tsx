@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader } from 'lucide-react';
-import { classifyImage } from '@/utils/mockClassifier';
-import { performDiagnosis } from '@/components/DiagnosisService';
+
 
 const UploadForm = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -79,58 +78,49 @@ const UploadForm = () => {
     fileInputRef.current?.click();
   };
 
-  const handleSubmit = async () => {
-    if (!image) {
-      toast({
-        title: "No image selected",
-        description: "Please select an image to analyze.",
-        variant: "destructive"
-      });
-      return;
-    }
+ const handleSubmit = async () => {
+  if (!image) {
+    toast({
+      title: "No image selected",
+      description: "Please select an image to analyze.",
+      variant: "destructive"
+    });
+    return;
+  }
 
-    try {
-      setIsLoading(true);
-      
-      // Check if user is logged in
-      const isLoggedIn = localStorage.getItem("user") !== null;
-      
-      if (isLoggedIn) {
-        // If logged in, use the DiagnosisService to save to medical history
-        const diagnosisResult = await performDiagnosis(image);
-        
-        // Store the result in session storage to pass to the results page
-        sessionStorage.setItem('detectionResult', JSON.stringify({
-          isColoboma: diagnosisResult.result.isColoboma,
-          confidence: diagnosisResult.result.confidence,
-          imageUrl: preview,
-          id: diagnosisResult.id
-        }));
-      } else {
-        // If not logged in, just use the classifier without saving to history
-        const result = await classifyImage(image);
-        
-        // Store the result in session storage to pass to the results page
-        sessionStorage.setItem('detectionResult', JSON.stringify({
-          isColoboma: result.isColoboma,
-          confidence: result.confidence,
-          imageUrl: preview
-        }));
-      }
-      
-      // Navigate to results page
-      navigate('/results');
-    } catch (error) {
-      console.error('Error processing image:', error);
-      toast({
-        title: "Processing Error",
-        description: "An error occurred while analyzing the image. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  try {
+    setIsLoading(true);
+
+    const formData = new FormData();
+    formData.append('image', image);
+
+    const response = await fetch('http://127.0.0.1:5000/predict', {
+      method: 'POST',
+      body: formData
+    });
+
+    const data = await response.json();
+
+    sessionStorage.setItem('detectionResult', JSON.stringify({
+      isColoboma: data.isColoboma,
+      confidence: data.confidence,
+      imageUrl: preview
+    }));
+
+    navigate('/results');
+
+  } catch (error) {
+    console.error('Error processing image:', error);
+    toast({
+      title: "Processing Error",
+      description: "An error occurred while analyzing the image. Please try again.",
+      variant: "destructive"
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="container-center">
